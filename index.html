@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celenganku Clone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="home-view" class="view active">
+        <header class="app-bar">
+            <h1>Celenganku</h1>
+            <div class="app-bar-actions">
+                <button id="theme-btn">🌓</button>
+                <button>⋮</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <div class="tab-item active" onclick="setTab('active')">In progress</div>
+            <div class="tab-item" onclick="setTab('complete')">Complete</div>
+            <div class="tab-indicator"></div>
+        </div>
+
+        <div class="filter-container">
+            <select id="sort-select" onchange="renderHome()">
+                <option value="name">Savings Name</option>
+                <option value="price-asc">Harga Terkecil</option>
+                <option value="price-desc">Harga Terbesar</option>
+            </select>
+            <select id="order-select" onchange="renderHome()">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
+
+        <div id="savings-list" class="content-scroll">
+        </div>
+
+        <button class="fab-extended" onclick="openModal('modal-form')">
+            <span>+</span> Add Savings
+        </button>
+    </div>
+
+    <div id="detail-view" class="view">
+        <header class="app-bar transparent">
+            <button onclick="goHome()" class="icon-btn">←</button>
+            <h2 id="detail-title" class="header-title">Detail</h2>
+            <div class="app-bar-actions">
+                <button onclick="editCurrentTarget()" class="icon-btn">✎</button>
+                <button onclick="deleteCurrentTarget()" class="icon-btn text-red">🗑</button>
+            </div>
+        </header>
+
+        <div class="content-scroll detail-content">
+            <div class="detail-image-container">
+                <img id="detail-img" src="" alt="Target Image">
+            </div>
+
+            <div class="card detail-main-card">
+                <div class="detail-row">
+                    <div>
+                        <h2 id="detail-goal-amount">Rp 0</h2>
+                        <p id="detail-per-period" class="subtext">Rp 0 Per Week</p>
+                    </div>
+                    <div class="progress-circle" id="detail-progress-circle">
+                        <span id="detail-percent">0%</span>
+                    </div>
+                </div>
+                <hr class="divider">
+                <div class="detail-meta">
+                    <div class="meta-row">
+                        <span>Created Date</span>
+                        <span id="detail-created">30 May 2023</span>
+                    </div>
+                    <div class="meta-row">
+                        <span>Estimation</span>
+                        <span id="detail-estimation">0 Weeks More</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card reminder-card">
+                <div class="reminder-icon">🔔</div>
+                <div class="reminder-info">
+                    <h3 id="reminder-time">12:00</h3>
+                    <p id="reminder-day">Sunday</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="reminder-toggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="card stats-card">
+                <div class="stat-item">
+                    <span>Collected</span>
+                    <h4 class="text-green" id="stat-collected">Rp 0</h4>
+                </div>
+                <div class="vertical-line"></div>
+                <div class="stat-item">
+                    <span>Remaining</span>
+                    <h4 class="text-red" id="stat-remaining">Rp 0</h4>
+                </div>
+            </div>
+
+            <div id="history-list" class="history-section">
+            </div>
+
+            <div style="height: 100px;"></div>
+        </div>
+
+        <button class="fab-small" onclick="openModal('modal-transaction')">
+            📝
+        </button>
+    </div>
+
+    <div id="modal-form" class="modal">
+        <div class="modal-content">
+            <h3>Buat Target Baru</h3>
+            <form id="form-target">
+                <div class="input-group">
+                    <label>Nama Barang</label>
+                    <input type="text" id="inp-name" required placeholder="Contoh: iPad Pro">
+                </div>
+                <div class="input-group">
+                    <label>Gambar</label>
+                    <input type="file" id="inp-image" accept="image/*">
+                </div>
+                <div class="input-group">
+                    <label>Target Harga (Rp)</label>
+                    <input type="number" id="inp-goal" required>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label>Nominal Nabung</label>
+                        <input type="number" id="inp-saving" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Periode</label>
+                        <select id="inp-freq">
+                            <option value="Harian">Harian</option>
+                            <option value="Mingguan" selected>Mingguan</option>
+                            <option value="Bulanan">Bulanan</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeModal('modal-form')">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-transaction" class="modal">
+        <div class="modal-content">
+            <h3>Update Saldo</h3>
+            <form id="form-transaction">
+                <div class="input-group">
+                    <label>Jumlah (Rp)</label>
+                    <input type="number" id="trans-amount" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-red" onclick="processTransaction('tarik')">Tarik (-)</button>
+                    <button type="button" class="btn-green" onclick="processTransaction('nabung')">Nabung (+)</button>
+                </div>
+                <p style="text-align: center; margin-top:10px; font-size: 0.8em; color:#666;"
+                    onclick="closeModal('modal-transaction')">Batal</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
